@@ -60,7 +60,7 @@ class TestHBNBCommand(unittest.TestCase):
         with patch('sys.stdout', new=StringIO()) as f:
 
             # Test if new instance of specified class is created and saved
-            # Only when command usage is correct: 
+            # Only when command usage is correct:
             # create <class name> <param 1> <param 2> <param 3>...
             HBNBCommand().onecmd('create State name="Ethiopia"')
             i_id = f.getvalue().strip('\n')  # save the instance_id
