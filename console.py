@@ -27,7 +27,8 @@ class HBNBCommand(cmd.Cmd):
     types = {
              'number_rooms': int, 'number_bathrooms': int,
              'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
+             'latitude': float, 'longitude': float,
+             'city_id': str, 'user_id': str, 'name': str
             }
 
     def preloop(self):
@@ -73,7 +74,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -118,10 +119,32 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+
+        # split the param arguments
+        params = args.split()
+
+        # Check if class name is valid
+        if params[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
+
+        # Create a new instance of class
+        new_instance = HBNBCommand.classes[params[0]]()
+
+        # Set the attributes of instance with valid params arguments passed
+        for param in params[1:]:
+            attr_key = param.split("=")[0]
+            if attr_key not in HBNBCommand.types:
+                continue
+            else:
+                attr_value = param.split("=")[1].strip('"')
+                try:
+                    if HBNBCommand.types[attr_key] == str:
+                        attr_value = attr_value.replace("_", " ")
+                    value = HBNBCommand.types[attr_key](attr_value)
+                except Exception:
+                    continue
+                setattr(new_instance, attr_key, value)
         storage.save()
         print(new_instance.id)
         storage.save()
@@ -319,6 +342,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
