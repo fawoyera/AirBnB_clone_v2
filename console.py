@@ -28,7 +28,10 @@ class HBNBCommand(cmd.Cmd):
              'number_rooms': int, 'number_bathrooms': int,
              'max_guest': int, 'price_by_night': int,
              'latitude': float, 'longitude': float,
-             'city_id': str, 'user_id': str, 'name': str
+             'city_id': str, 'user_id': str, 'name': str,
+             'state_id': str, 'email': str, 'password': str,
+             'first_name': str, 'last_name': str,
+             'description': str
             }
 
     def preloop(self):
