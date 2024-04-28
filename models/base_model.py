@@ -18,19 +18,30 @@ class BaseModel:
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
         if not kwargs:
-            from models import storage
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
         else:
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            del kwargs['__class__']
-            self.__dict__.update(kwargs)
+            kargs = kwargs
+            if "updated_at" in kargs:
+                kargs['updated_at'] = datetime.strptime(kargs['updated_at'],
+                                                        '%Y-%m-%dT%H:%M:%S.%f')
+            if "created_at" in kargs:
+                kargs['created_at'] = datetime.strptime(kargs['created_at'],
+                                                        '%Y-%m-%dT%H:%M:%S.%f')
+            if '__class__' in kargs:
+                del kargs['__class__']
 
-            for key, value in kwargs.items():
+            if "id" not in kargs:
+                self.id = str(uuid.uuid4())
+
+            if "created_at" not in kargs:
+                self.created_at = datetime.now()
+
+            if "updated_at" not in kargs:
+                self.updated_at = datetime.now()
+
+            for key, value in kargs.items():
                 setattr(self, key, value)
 
     def __str__(self):

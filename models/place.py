@@ -1,8 +1,21 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
+from models.engine.file_storage import FileStorage
+import os
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship
+
+
+place_amenity = Table('place_amenity', Base.metadata,
+                      Column('place_id', String(60), ForeignKey('places.id'),
+                             primary_key=True, nullable=False),
+                      Column('amenity_id', String(60),
+                             ForeignKey('amenities.id'),
+                             primary_key=True, nullable=False)
+                      )
+
+HBNB_TYPE_STORAGE = os.environ.get('HBNB_TYPE_STORAGE')
 
 
 class Place(BaseModel, Base):
@@ -23,7 +36,25 @@ class Place(BaseModel, Base):
     reviews = relationship('Review', cascade="all, delete, delete-orphan",
                            backref="place")
 
-    @property
-    def reviews(self):
-        return [k for k in FileStorage.__objects
-                if (k.split(".")[0] == 'Reviews' and k.place_id == self.id)]
+    if HBNB_TYPE_STORAGE != 'db':
+        @property
+        def reviews(self):
+            return [k for k in FileStorage.__objects
+                    if (k.split(".")[0] == 'Reviews'
+                        and k.place_id == self.id)]
+
+    amenities = relationship('Amenity', secondary='place_amenity',
+                             backref="place_amenities",
+                             viewonly=False)
+
+    if HBNB_TYPE_STORAGE != 'db':
+        @property
+        def amenities(self):
+            return [k for k in FileStorage.__objects
+                    if (k.split(".")[0] == 'Amenity'
+                        and k.split(".")[1] in amenity_ids)]
+
+        @amenities.setter
+        def amenities(self, obj):
+            if obj.__class__.__name__ == 'Amenity':
+                amenity_ids.append(obj.id)
