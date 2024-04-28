@@ -31,7 +31,7 @@ class HBNBCommand(cmd.Cmd):
              'city_id': str, 'user_id': str, 'name': str,
              'state_id': str, 'email': str, 'password': str,
              'first_name': str, 'last_name': str,
-             'description': str
+             'description': str, 'place_id': str, 'text': str
             }
 
     def preloop(self):
@@ -119,6 +119,9 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
+        import os
+
+        HBNB_TYPE_STORAGE = os.environ.get('HBNB_TYPE_STORAGE')
         if not args:
             print("** class name missing **")
             return
@@ -148,6 +151,7 @@ class HBNBCommand(cmd.Cmd):
                 except Exception:
                     continue
                 setattr(new_instance, attr_key, value)
+        new_instance.save()
         storage.save()
         print(new_instance.id)
         storage.save()
@@ -225,6 +229,8 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
+        import os
+        HBNB_TYPE_STORAGE = os.environ.get('HBNB_TYPE_STORAGE')
         print_list = []
 
         if args:
@@ -232,13 +238,24 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            if HBNB_TYPE_STORAGE != 'db':
+                for k, v in storage._FileStorage__objects.items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
+            else:
+                args = HBNBCommand.classes[args]
+                objs = storage._DBStorage__session.query(args).all()
+                for obj in objs:
+                    print_list.append(str(obj))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
+            if HBNB_TYPE_STORAGE != 'db':
+                for k, v in storage._FileStorage__objects.items():
+                    print_list.append(str(v))
+            else:
+                for obj in storage._DBStorage__session.query(User, State, City,
+                                                             Place, Amenity,
+                                                             Review).all():
+                    print_list.append(str(obj))
         print(print_list)
 
     def help_all(self):
