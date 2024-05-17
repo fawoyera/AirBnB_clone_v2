@@ -13,21 +13,24 @@ env.user = 'ubuntu'
 
 def do_pack():
     """Function to archive content of web_static"""
-    local('mkdir -p versions')
-    now = datetime.now()
-    formatted_date_time = now.strftime('%Y%m%d%H%M%S')
-    archive_path = f"versions/web_static_{formatted_date_time}.tgz"
-    result = local('tar -cvzf {} web_static'.format(archive_path))
-    if result.succeeded:
-        print(result)
+    try:
+        local('mkdir -p versions')
+        now = datetime.now()
+        formatted_date_time = now.strftime('%Y%m%d%H%M%S')
+        archive_path = f"versions/web_static_{formatted_date_time}.tgz"
+        result = local('tar -cvzf {} web_static'.format(archive_path))
+        if result.succeeded:
+            print(result)
         return archive_path
-    else:
+    except Exception:
         return None
 
 
 def do_deploy(archive_path):
     """Function to deploy archived content of web_static to web servers"""
-    if os.path.exists(archive_path):
+    if not os.path.exists(archive_path):
+        return False
+    try:
         archive_file_nopath = os.path.basename(archive_path)
         archive_path_noext = os.path.splitext(archive_file_nopath)[0]
         r1 = put('{}'.format(archive_path), '/tmp')
@@ -47,9 +50,7 @@ def do_deploy(archive_path):
         if (r1.succeeded and r2.succeeded and r3.succeeded and r4.succeeded and
            r5.succeeded and r6.succeeded and r7.succeeded and r8.succeeded):
             return True
-        else:
-            return False
-    else:
+    except Exception:
         return False
 
 
