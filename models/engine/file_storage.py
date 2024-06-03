@@ -78,3 +78,7 @@ class FileStorage:
 
         if obj.to_dict()['__class__'] + '.' + obj.id in self.all():
             self.all().pop(obj.to_dict()['__class__'] + '.' + obj.id)
+
+    def close(self):
+        """Method to deserialize the json file to objects"""
+        self.reload()

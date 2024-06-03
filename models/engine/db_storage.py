@@ -37,6 +37,7 @@ class DBStorage:
         from models.city import City
         from models.amenity import Amenity
         from models.review import Review
+        from sqlalchemy import text
 
         classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
@@ -49,7 +50,7 @@ class DBStorage:
                                                  Amenity, Review).all()
         else:
             if cls.__name__ in classes:
-                query_results = self.__session.query(cls.__name__).all()
+                query_results = self.__session.query(cls).all()
 
         return {obj.__class__.__name__ + '.' + obj.id: obj for
                 obj in query_results}
@@ -86,3 +87,7 @@ class DBStorage:
                                        expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
+
+    def close(self):
+        """Method to remove private session attribute self.__session"""
+        self.__session.close()
