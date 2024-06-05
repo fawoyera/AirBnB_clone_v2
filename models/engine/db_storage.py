@@ -20,7 +20,7 @@ class DBStorage:
         HBNB_MYSQL_HOST = os.environ.get('HBNB_MYSQL_HOST')
         HBNB_MYSQL_DB = os.environ.get('HBNB_MYSQL_DB')
         HBNB_ENV = os.environ.get('HBNB_ENV')
-        
+
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(HBNB_MYSQL_USER, HBNB_MYSQL_PWD,
                                               HBNB_MYSQL_HOST, HBNB_MYSQL_DB),
