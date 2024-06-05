@@ -27,7 +27,7 @@ def states_():
 @app.route('/states/<id>', strict_slashes=False)
 def states_id(id):
     """states with id route"""
-    ids = escape(id) in  [state.id for state in states]
+    ids = escape(id) in [state.id for state in states]
     if ids:
         state = [state for state in states if state.id == escape(id)][0]
     else:
